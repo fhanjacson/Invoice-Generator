@@ -23,9 +23,33 @@ namespace INVOICE
             
         }
 
+        private void preExcel()
+        {
+            int RowCount = DGV.RowCount - 1;
+            int ColumnCount = DGV.ColumnCount;
+
+            for (int i = 0; i < RowCount; i++)
+            {
+                DGV.Rows[i].Cells[4].Value = String2Int(DGV.Rows[i].Cells[1].Value.ToString()) * String2Int(DGV.Rows[i].Cells[3].Value.ToString());
+                for (int j = 0; j < ColumnCount; j++)
+                {
+                    if (DGV.Rows[i].Cells[j].Value == null || DGV.Rows[i].Cells[j].Value == DBNull.Value)
+                    {
+                        DGV.Rows[i].Cells[j].Value = 0;
+                    }
+                }
+                DGV.Rows[i].Cells[6].Value = String2Int(DGV.Rows[i].Cells[4].Value.ToString()) - String2Int(DGV.Rows[i].Cells[5].Value.ToString());
+                Excelobj.ExcelInvoiceSubTotal = String2Int(Excelobj.ExcelInvoiceSubTotal + DGV.Rows[i].Cells[6].Value.ToString());
+                
+            }
+            
+
+        }
+
+
         private void Button_Done_Click(object sender, EventArgs e)
         {
-
+            preExcel();
             Excelobj.ExcelFileLocation = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             Console.WriteLine(Excelobj.ExcelFileLocation.ToString());
 
@@ -47,7 +71,9 @@ namespace INVOICE
                     var worksheet = Excel.Workbook.Worksheets["INVOICE 01"];
 
                     int offset = 0;
-                    offset = DGV.RowCount - 1;
+                    int RowCount = DGV.RowCount - 1;
+                    int ColumnCount = DGV.ColumnCount;
+                    offset = RowCount;
                     
                     
                     
@@ -100,7 +126,41 @@ namespace INVOICE
                     {
                         new string[] { "No" , "Nama Barang" , "" , "Jumlah" , "" , "Harga @" , "Harga" , "Discount" , "Total" }
                     };
-                    
+
+                    List<string[]> InvoiceItems = new List<string[]>();
+
+                    //for (int i = 0; i < RowCount; i++)
+                    //{
+                    //    string[] abc = new string[ColumnCount];
+                    //    for (int j = 0; j < ColumnCount; j++)
+                    //    {
+                    //        abc[j] = DGV.Rows[i].Cells[j].Value.ToString();
+                    //    }
+                    //    InvoiceItems.Add(abc);
+                    //}
+
+                    if (offset > 0)
+                    {
+                        for (int i = 0; i < RowCount; i++)
+                        {
+                            InvoiceItems.Add(new string[] {
+                            (i+1).ToString(),
+                            DGV.Rows[i].Cells[0].Value.ToString(),
+                            "",
+                            DGV.Rows[i].Cells[1].Value.ToString(),
+                            DGV.Rows[i].Cells[2].Value.ToString(),
+                            DGV.Rows[i].Cells[3].Value.ToString(),
+                            DGV.Rows[i].Cells[4].Value.ToString(),
+                            DGV.Rows[i].Cells[5].Value.ToString(),
+                            DGV.Rows[i].Cells[6].Value.ToString()
+                        });
+                        }
+                    }
+
+
+
+
+
                     List<string[]> InvoiceFooter = new List<string[]>()
                     {
                         new string[] { "","","" , "" , "" , "" , "Sub Total" , ":" , "PLACEHOLDER" },
@@ -139,6 +199,8 @@ namespace INVOICE
 
                     //Populate Cell
                     worksheet.Cells["A1:I6"].LoadFromArrays(InvoiceHeader);
+                    worksheet.Cells["A8:I8"].LoadFromArrays(TableHeader);
+                    worksheet.Cells["A9:I" + (9 + offset)].LoadFromArrays(InvoiceItems);
                     worksheet.Cells["A" + (9 + offset) + ":I" + (14 + offset)].LoadFromArrays(InvoiceFooter);
 
                     //worksheet.Cells["A1:I1"].LoadFromArrays(Row01);
@@ -148,7 +210,7 @@ namespace INVOICE
                     //worksheet.Cells["A5:I5"].LoadFromArrays(Row05);
                     //worksheet.Cells["A6:I6"].LoadFromArrays(Row06);
 
-                    worksheet.Cells["A8:I8"].LoadFromArrays(TableHeader);
+                    
 
                     //worksheet.Cells["A" + (9 + offset) + ":I" + (9 + offset)].LoadFromArrays(TableFooter01);
                     //worksheet.Cells["A" + (10 + offset) + ":I" + (10 + offset)].LoadFromArrays(TableFooter02);
@@ -185,8 +247,15 @@ namespace INVOICE
                     worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Merge = true;
                     worksheet.Cells["D" + (14 + offset) + ":E" + (14 + offset)].Merge = true;
 
-                    
+                    if (offset > 0)
+                    {
+                        for (int i = 0; i < offset; i++)
+                        {
+                            worksheet.Cells["B" + (9 + i) + ":C" + (9 + i)].Merge = true;
+                        }
+                    }
 
+                    
                     ///////////////////////
                     // CELL Width Config //
                     ///////////////////////
@@ -214,7 +283,13 @@ namespace INVOICE
                     worksheet.Cells["D5"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     worksheet.Cells["A8:I8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                    //AutoGenerated
+                    //ITEMS
+                    if (offset > 0)
+                    {
+                        worksheet.Cells["D9:D" + (9+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        worksheet.Cells["F9:I" + (9+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        
+                    }
 
                     //Alignment 02
                     worksheet.Cells["G" + (9 + offset) + ":G" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
