@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,10 @@ namespace INVOICE
     public partial class Editor : Form
     {
         public static Excel Excelobj = EnterDetail.ExcelDetail;
-        
 
         public Editor()
         {
             InitializeComponent();
-            
         }
 
         private void preExcel()
@@ -28,22 +27,87 @@ namespace INVOICE
             int RowCount = DGV.RowCount - 1;
             int ColumnCount = DGV.ColumnCount;
 
-            for (int i = 0; i < RowCount; i++)
+
+            if (string.IsNullOrWhiteSpace(TextBox_Discount.Text) || !isInt(TextBox_Discount.Text)) {
+                TextBox_Discount.Text = "0";
+
+            }
+            if (string.IsNullOrWhiteSpace(TextBox_PPN.Text) || !isInt(TextBox_PPN.Text)) {
+                TextBox_PPN.Text = "0";
+            }
+
+
+            if (RowCount > 0)
             {
-                DGV.Rows[i].Cells[4].Value = String2Int(DGV.Rows[i].Cells[1].Value.ToString()) * String2Int(DGV.Rows[i].Cells[3].Value.ToString());
-                for (int j = 0; j < ColumnCount; j++)
+                int subtotal;
+                subtotal = 0;
+                
+                for (int i = 0; i < RowCount; i++)
                 {
-                    if (DGV.Rows[i].Cells[j].Value == null || DGV.Rows[i].Cells[j].Value == DBNull.Value)
+                    for (int j = 0; j < ColumnCount; j++)
                     {
-                        DGV.Rows[i].Cells[j].Value = 0;
+                        if (DGV.Rows[i].Cells[j].Value != null)
+                        {
+                            Console.WriteLine("Not Null");
+                            if (j != 2 && j != 0)
+                            {
+                                if (!int.TryParse(DGV.Rows[i].Cells[j].Value.ToString(), out int a))
+                                {
+                                    DGV.Rows[i].Cells[j].Value = 0;
+                                }
+                            }
+                            else if (j == 0)
+                            {
+                                if (string.IsNullOrWhiteSpace(DGV.Rows[i].Cells[j].Value.ToString()))
+                                {
+                                    DGV.Rows[i].Cells[j].Value = "Item";
+                                }
+                            }
+                            else if (j == 2)
+                            {
+                                if (string.IsNullOrWhiteSpace(DGV.Rows[i].Cells[j].Value.ToString()))
+                                {
+                                    DGV.Rows[i].Cells[j].Value = "Pcs";
+                                }
+                            }
+                        }
+                        else if (DGV.Rows[i].Cells[j].Value == null)
+                        {
+                            Console.WriteLine("Null");
+                            if (j != 2)
+                            {
+                                DGV.Rows[i].Cells[j].Value = 0;
+                            }
+                            else if (j == 0)
+                            {
+                                DGV.Rows[i].Cells[j].Value = "Item";
+                            }
+                            else if (j == 2)
+                            {
+                                DGV.Rows[i].Cells[j].Value = "Pcs";
+                            }
+                            
+                        }
                     }
+                    //Calculate Total Before Discount
+                    DGV.Rows[i].Cells[4].Value = String2Int(DGV.Rows[i].Cells[1].Value.ToString()) * String2Int(DGV.Rows[i].Cells[3].Value.ToString());
+                    //Calculate Total After Discount
+                    DGV.Rows[i].Cells[6].Value = String2Int(DGV.Rows[i].Cells[4].Value.ToString()) - String2Int(DGV.Rows[i].Cells[5].Value.ToString());
+                    //Saving Subtotal to object
+                    subtotal = subtotal + String2Int(DGV.Rows[i].Cells[6].Value.ToString());
                 }
-                DGV.Rows[i].Cells[6].Value = String2Int(DGV.Rows[i].Cells[4].Value.ToString()) - String2Int(DGV.Rows[i].Cells[5].Value.ToString());
-                Excelobj.ExcelInvoiceSubTotal = String2Int(Excelobj.ExcelInvoiceSubTotal + DGV.Rows[i].Cells[6].Value.ToString());
+                //Console.WriteLine("subtotal: " + subtotal);
+                Excelobj.ExcelInvoiceSubTotal = subtotal;
+                //Console.WriteLine(Excelobj.ExcelInvoiceSubTotal.ToString());
+                Label_SubTotal.Text = "Sub Total : " + convert2IDR(Excelobj.ExcelInvoiceSubTotal);
+                
+                Excelobj.ExcelInvoiceDiscount = String2Int(TextBox_Discount.Text);
+                Excelobj.ExcelInvoicePPN = String2Int(TextBox_PPN.Text);
+
+                Excelobj.ExcelInvoiceGrandTotal = (Excelobj.ExcelInvoiceSubTotal - Excelobj.ExcelInvoiceDiscount) - Excelobj.ExcelInvoicePPN;
+                Label_GrandTotal.Text = "Grand Total : " + convert2IDR(Excelobj.ExcelInvoiceGrandTotal);
                 
             }
-            
-
         }
 
 
@@ -90,54 +154,12 @@ namespace INVOICE
 
                     };
 
-
-
-
-                    //Console.WriteLine(Row01[1]);
-
-                    //List<string[]> Row02 = new List<string[]>()
-                    //{
-                    //    new string[] { "TEMBESI CENTRE BLOK. A3  NO. 3, 3A  &  5  BATU AJI - BATAM", "", "", "", "", "", "", Excelobj.ExcelAddress2, "" }
-                    //};
-
-                    //List<string[]> Row03 = new List<string[]>()
-                    //{
-                    //    new string[] { "Tlp:  0778 - 702 6785    Fax :  0778 - 358 2804", "" , "" , "" , "" , "" , "" , Excelobj.ExcelAddress3, "" }
-                    //};
-
-                    //List<string[]> Row04 = new List<string[]>()
-                    //{
-                    //    new string[] { "E-Mail : surya.simpang.barelang@gmail.com", "", "", "", "", "", "Telepon :", Excelobj.ExcelConctactNumber, "" }
-                    //};
-
-                    //List<string[]> Row05 = new List<string[]>()
-                    //{
-                    //    new string[] { "Invoice No : " + Excelobj.ExcelInvoiceNumber , "", "" , "INVOICE" , "" , "" , "" , "" , "" }
-                    //};
-
-                    //List<string[]> Row06 = new List<string[]>()
-                    //{
-                    //    new string[] { "Tanggal      : " + Excelobj.ExcelInvoiceDate , "" , "" , "" , "" , "" , "" , "" , ""}
-                    //};
-
-                    //
-
                     List<string[]> TableHeader = new List<string[]>()
                     {
                         new string[] { "No" , "Nama Barang" , "" , "Jumlah" , "" , "Harga @" , "Harga" , "Discount" , "Total" }
                     };
 
                     List<string[]> InvoiceItems = new List<string[]>();
-
-                    //for (int i = 0; i < RowCount; i++)
-                    //{
-                    //    string[] abc = new string[ColumnCount];
-                    //    for (int j = 0; j < ColumnCount; j++)
-                    //    {
-                    //        abc[j] = DGV.Rows[i].Cells[j].Value.ToString();
-                    //    }
-                    //    InvoiceItems.Add(abc);
-                    //}
 
                     if (offset > 0)
                     {
@@ -149,77 +171,30 @@ namespace INVOICE
                             "",
                             DGV.Rows[i].Cells[1].Value.ToString(),
                             DGV.Rows[i].Cells[2].Value.ToString(),
-                            DGV.Rows[i].Cells[3].Value.ToString(),
-                            DGV.Rows[i].Cells[4].Value.ToString(),
-                            DGV.Rows[i].Cells[5].Value.ToString(),
-                            DGV.Rows[i].Cells[6].Value.ToString()
+                            convert2IDR(String2Int(DGV.Rows[i].Cells[3].Value.ToString())),
+                            convert2IDR(String2Int(DGV.Rows[i].Cells[4].Value.ToString())),
+                            convert2IDR(String2Int(DGV.Rows[i].Cells[5].Value.ToString())),
+                            convert2IDR(String2Int(DGV.Rows[i].Cells[6].Value.ToString()))
                         });
                         }
                     }
 
 
-
-
-
                     List<string[]> InvoiceFooter = new List<string[]>()
                     {
-                        new string[] { "","","" , "" , "" , "" , "Sub Total" , ":" , "PLACEHOLDER" },
-                        new string[] { "Catatan :" ,"", Excelobj.ExcelInvoiceNote , "" , "" , "" , "Discount" , ":" , "PLACEHOLDER" },
-                        new string[] { "","","" , "" , "" , "" , "PPN" , ":" , "PLACEHOLDER" },
-                        new string[] { "","","" , "" , "" , "" , "Grand Total" , ":" , "PLACEHOLDER" },
+                        new string[] { "","","" , "" , "" , "" , "Sub Total" , ": " , convert2IDR(Excelobj.ExcelInvoiceSubTotal) },
+                        new string[] { "Catatan :" ,"", Excelobj.ExcelInvoiceNote , "" , "" , "" , "Discount" , ": " , convert2IDR(Excelobj.ExcelInvoiceDiscount) },
+                        new string[] { "","","" , "" , "" , "" , "PPN" , ": " , convert2IDR(Excelobj.ExcelInvoicePPN) },
+                        new string[] { "","","" , "" , "" , "" , "Grand Total" , ": " , convert2IDR(Excelobj.ExcelInvoiceGrandTotal) },
                         new string[] { "", "", "" , "" , "" , "" , "" , "" , "" },
                         new string[] { "", "Yang Menerima" , "" , "Kepala Gudang" , "" , "" , "Supir/Helper" , "" , "Hormat Kami" }
                     };
-
-                    //List<string[]> TableFooter01 = new List<string[]>()
-                    //{
-                    //    new string[] { "","","" , "" , "" , "" , "Sub Total" , ":" , "PLACEHOLDER" }
-                    //};
-
-                    //List<string[]> TableFooter02 = new List<string[]>()
-                    //{
-                    //    new string[] { "Catatan :" ,"", Excelobj.ExcelInvoiceNote , "" , "" , "" , "Discount" , ":" , "PLACEHOLDER" }
-                    //};
-
-                    //List<string[]> TableFooter03 = new List<string[]>()
-                    //{
-                    //    new string[] { "","","" , "" , "" , "" , "PPN" , ":" , "PLACEHOLDER" }
-                    //};
-
-                    //List<string[]> TableFooter04 = new List<string[]>()
-                    //{
-                    //    new string[] { "","","" , "" , "" , "" , "Grand Total" , ":" , "PLACEHOLDER" }
-                    //};
-
-                    //List<string[]> TableFooter05 = new List<string[]>()
-                    //{
-                    //    new string[] { "","Yang Menerima" , "" , "Kepala Gudang" , "" , "" , "Supir/Helper" , "" , "Hormat Kami" }
-                    //};
-
 
                     //Populate Cell
                     worksheet.Cells["A1:I6"].LoadFromArrays(InvoiceHeader);
                     worksheet.Cells["A8:I8"].LoadFromArrays(TableHeader);
                     worksheet.Cells["A9:I" + (9 + offset)].LoadFromArrays(InvoiceItems);
                     worksheet.Cells["A" + (9 + offset) + ":I" + (14 + offset)].LoadFromArrays(InvoiceFooter);
-
-                    //worksheet.Cells["A1:I1"].LoadFromArrays(Row01);
-                    //worksheet.Cells["A2:I2"].LoadFromArrays(Row02);
-                    //worksheet.Cells["A3:I3"].LoadFromArrays(Row03);
-                    //worksheet.Cells["A4:I4"].LoadFromArrays(Row04);
-                    //worksheet.Cells["A5:I5"].LoadFromArrays(Row05);
-                    //worksheet.Cells["A6:I6"].LoadFromArrays(Row06);
-
-                    
-
-                    //worksheet.Cells["A" + (9 + offset) + ":I" + (9 + offset)].LoadFromArrays(TableFooter01);
-                    //worksheet.Cells["A" + (10 + offset) + ":I" + (10 + offset)].LoadFromArrays(TableFooter02);
-                    //worksheet.Cells["A" + (11 + offset) + ":I" + (11 + offset)].LoadFromArrays(TableFooter03);
-                    //worksheet.Cells["A" + (12 + offset) + ":I" + (12 + offset)].LoadFromArrays(TableFooter04);
-                    //worksheet.Cells["A" + (14 + offset) + ":I" + (14 + offset)].LoadFromArrays(TableFooter05);
-
-
-
 
                     //////////////////////////
                     // Cell Merge Operation //
@@ -260,15 +235,17 @@ namespace INVOICE
                     // CELL Width Config //
                     ///////////////////////
 
-                    worksheet.Column(1).Width = 5 + 0.71;
-                    worksheet.Column(2).Width = 15 + 0.71;
-                    worksheet.Column(3).Width = 30 + 0.71;
-                    worksheet.Column(4).Width = 7.5 + 0.71;
-                    worksheet.Column(5).Width = 7.5 + 0.71;
-                    worksheet.Column(6).Width = 15 + 0.71;
-                    worksheet.Column(7).Width = 15 + 0.71;
-                    worksheet.Column(8).Width = 15 + 0.71;
-                    worksheet.Column(9).Width = 15 + 0.71;
+                    worksheet.Column(1).Width = 3;
+                    worksheet.Column(2).Width = 10;
+                    worksheet.Column(3).Width = 15;
+                    worksheet.Column(4).Width = 6;
+                    worksheet.Column(5).Width = 6;
+                    worksheet.Column(6).Width = 12;
+                    worksheet.Column(7).Width = 12;
+                    worksheet.Column(8).Width = 12;
+                    worksheet.Column(9).Width = 12;
+
+                    worksheet.Row(7).Height = 1;
 
                     
                     ///////////////////////
@@ -279,7 +256,6 @@ namespace INVOICE
                     worksheet.Cells["A1:I6"].Style.Font.Bold = true;
                     worksheet.Cells["D5"].Style.Font.UnderLine = true;
                     worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Style.WrapText = true;
-                    //Alignment 01
                     worksheet.Cells["D5"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     worksheet.Cells["A8:I8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
@@ -288,20 +264,15 @@ namespace INVOICE
                     {
                         worksheet.Cells["D9:D" + (9+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                         worksheet.Cells["F9:I" + (9+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                        
                     }
 
-                    //Alignment 02
                     worksheet.Cells["G" + (9 + offset) + ":G" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
                     worksheet.Cells["H" + (9 + offset) + ":H" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                     worksheet.Cells["I" + (9 + offset) + ":I" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                     worksheet.Cells["A" + (10 + offset) + ":B" + (10 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                     worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
                     worksheet.Cells["A" + (14 + offset) + ":I" + (14 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                    
-
-                    //worksheet.Cells["A14:G14"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                    
+                                        
                     ////////////
                     // Border //
                     ////////////
@@ -315,10 +286,6 @@ namespace INVOICE
                     worksheet.Cells["D" + (17 + offset) + ":E" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                     worksheet.Cells["G" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                     worksheet.Cells["I" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-
-
-
-
 
                     // SET PRINT AREA //
                     worksheet.PrinterSettings.PrintArea = worksheet.Cells["A1:I" + (17 + offset)];
@@ -337,73 +304,27 @@ namespace INVOICE
                     {
                         System.Diagnostics.Process.Start(ExcelFile.ToString());
                     }
-
-
-
+                    Done();
                 }
                 else
                 {
                     MessageBox.Show("Nama File Tidak Boleh Kosong");
                 }
             }
-
-            
-
-
         }
 
-        private void Editor_Load(object sender, EventArgs e)
+        private void Reset()
         {
-            
+            Label_SubTotal.Text = "Sub Total :";
+            TextBox_Discount.Text = "0";
+            TextBox_PPN.Text = "0";
+            Label_GrandTotal.Text = "Grand Total :";
+            DGV.Rows.Clear();
         }
 
-        private void DGV_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void Done()
         {
-            
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            int RowCount = DGV.RowCount - 1;
-            int ColumnCount = DGV.ColumnCount;
-
-            for (int i = 0; i < RowCount; i++)
-            {
-                DGV.Rows[i].Cells[4].Value = String2Int(DGV.Rows[i].Cells[1].Value.ToString()) * String2Int(DGV.Rows[i].Cells[3].Value.ToString());
-                for (int j = 0; j < ColumnCount; j++)
-                {
-                    if (DGV.Rows[i].Cells[j].Value == null || DGV.Rows[i].Cells[j].Value == DBNull.Value)
-                    {
-                        DGV.Rows[i].Cells[j].Value = 0;
-                    }
-                }
-                DGV.Rows[i].Cells[6].Value = String2Int(DGV.Rows[i].Cells[4].Value.ToString()) - String2Int(DGV.Rows[i].Cells[5].Value.ToString());
-            }
-            
-            
-
-
-            //for (int i = 0; i < RowCount; i++)
-            //{
-            //    for (int j = 0; j < ColumnCount; j++)
-            //    {
-            //        if (DGV.Rows[i].Cells[j].Value == null || DGV.Rows[i].Cells[j].Value == DBNull.Value)
-            //        {
-            //            Console.WriteLine("dub");
-            //            DGV.Rows[i].Cells[j].Value = 0;
-            //        }
-            //    }
-            //}
-
-
-            
-
-            //DGV.Rows[0].Cells[4].Value = String2Int(DGV.Rows[0].Cells[1].Value.ToString()) * String2Int(DGV.Rows[0].Cells[3].Value.ToString());
-
-
-
-
+            this.Close();
         }
         
         private int String2Int(string str)
@@ -413,7 +334,62 @@ namespace INVOICE
                 return parsed;
             }
             return 0;
+        }
 
+        private bool isInt(string str)
+        {
+            return int.TryParse(str, out int i);
+        }
+
+        private string convert2IDR(int i)
+        {
+            return i.ToString("C", CultureInfo.CreateSpecificCulture("id-ID"));
+        } 
+
+        private void Button_Reset_Click(object sender, EventArgs e)
+        {
+            Reset();
+        }
+        
+        private void TextBox_Discount_MouseClick(object sender, MouseEventArgs e)
+        {
+            preExcel();
+        }
+
+        private void TextBox_PPN_MouseClick(object sender, MouseEventArgs e)
+        {
+            preExcel();
+        }
+        
+        private void DGV_RowLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            preExcel();
+        }
+
+        private void TextBox_Discount_Leave(object sender, EventArgs e)
+        {
+            preExcel();
+        }
+
+        private void TextBox_PPN_Leave(object sender, EventArgs e)
+        {
+            preExcel();
+        }
+
+        private void Editor_Load(object sender, EventArgs e)
+        {
+            DGV.CurrentCell = DGV.Rows[0].Cells[0];
+        }
+
+        private void DGV_RowEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            preExcel();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
+            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "", "200", "");
         }
     }
 }

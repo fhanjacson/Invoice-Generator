@@ -25,10 +25,10 @@ namespace INVOICE
             if (!string.IsNullOrWhiteSpace(TextBox_InvoiceNo.Text)){
                 if (!string.IsNullOrWhiteSpace(DateTimePicker.Value.ToString())){
                     if (!string.IsNullOrWhiteSpace(TextBox_Address1.Text)){
-                        if (!string.IsNullOrWhiteSpace(TextBox_ContactNo.Text)){
+                        //if (!string.IsNullOrWhiteSpace(TextBox_ContactNo.Text)){
                             return true;
-                        } else { MessageBox.Show("Nomor Telepon tidak boleh kosong"); }
-                    }else { MessageBox.Show("Alamat 1 tidak boleh kosong"); }
+                        //} else { MessageBox.Show("Nomor Telepon tidak boleh kosong"); }
+                    }else { MessageBox.Show("Penerima tidak boleh kosong"); }
                 }else { MessageBox.Show("Tanggal Invoice tidak boleh kosong"); }
             }else { MessageBox.Show("Nomor Invoice tidak boleh kosong"); }
 
@@ -60,10 +60,7 @@ namespace INVOICE
 
         private void EnterDetail_Load(object sender, EventArgs e)
         {
-            // DELETE THIS BEFORE DEPLOY
-            TextBox_InvoiceNo.Text = "a";
-            TextBox_Address1.Text = "a";
-            TextBox_ContactNo.Text = "a";
+
         }
     }
 }
