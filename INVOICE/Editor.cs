@@ -149,8 +149,8 @@ namespace INVOICE
                         new string[] { "TEMBESI CENTRE BLOK. A3  NO. 3, 3A  &  5  BATU AJI - BATAM", "", "", "", "", "", "", Excelobj.ExcelAddress2, "" },
                         new string[] { "Tlp:  0778 - 702 6785    Fax :  0778 - 358 2804", "" , "" , "" , "" , "" , "" , Excelobj.ExcelAddress3, "" },
                         new string[] { "E-Mail : surya.simpang.barelang@gmail.com", "", "", "", "", "", "Telepon :", Excelobj.ExcelConctactNumber, "" },
-                        new string[] { "Invoice No : " + Excelobj.ExcelInvoiceNumber , "", "" , "INVOICE" , "" , "" , "" , "" , "" },
-                        new string[] { "Tanggal      : " + Excelobj.ExcelInvoiceDate , "" , "" , "" , "" , "" , "" , "" , ""}
+                        new string[] { "Invoice No : " + Excelobj.ExcelInvoiceNumber , "", "" , "INVOICE" , "" , "" , "Tanggal :" , Excelobj.ExcelInvoiceDate, ""},
+                       
 
                     };
 
@@ -191,10 +191,10 @@ namespace INVOICE
                     };
 
                     //Populate Cell
-                    worksheet.Cells["A1:I6"].LoadFromArrays(InvoiceHeader);
-                    worksheet.Cells["A8:I8"].LoadFromArrays(TableHeader);
-                    worksheet.Cells["A9:I" + (9 + offset)].LoadFromArrays(InvoiceItems);
-                    worksheet.Cells["A" + (9 + offset) + ":I" + (14 + offset)].LoadFromArrays(InvoiceFooter);
+                    worksheet.Cells["A1:I5"].LoadFromArrays(InvoiceHeader);
+                    worksheet.Cells["A6:I6"].LoadFromArrays(TableHeader);
+                    worksheet.Cells["A7:I" + (7 + offset)].LoadFromArrays(InvoiceItems);
+                    worksheet.Cells["A" + (7 + offset) + ":I" + (12 + offset)].LoadFromArrays(InvoiceFooter);
 
                     //////////////////////////
                     // Cell Merge Operation //
@@ -206,7 +206,7 @@ namespace INVOICE
                     worksheet.Cells["A3:F3"].Merge = true;
                     worksheet.Cells["A4:F4"].Merge = true;
                     worksheet.Cells["A5:C5"].Merge = true;
-                    worksheet.Cells["A6:C6"].Merge = true;
+                    //worksheet.Cells["A6:C6"].Merge = true;
                     
                     worksheet.Cells["D5:F5"].Merge = true;
 
@@ -214,19 +214,20 @@ namespace INVOICE
                     worksheet.Cells["H2:I2"].Merge = true;
                     worksheet.Cells["H3:I3"].Merge = true;
                     worksheet.Cells["H4:I4"].Merge = true;
+                    worksheet.Cells["H5:I5"].Merge = true;
                     
-                    worksheet.Cells["B8:C8"].Merge = true;
-                    worksheet.Cells["D8:E8"].Merge = true;
+                    worksheet.Cells["B6:C6"].Merge = true;
+                    worksheet.Cells["D6:E6"].Merge = true;
 
-                    worksheet.Cells["A" + (10 + offset) + ":B" + (10 + offset)].Merge = true;
-                    worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Merge = true;
-                    worksheet.Cells["D" + (14 + offset) + ":E" + (14 + offset)].Merge = true;
+                    worksheet.Cells["A" + (8 + offset) + ":B" + (8 + offset)].Merge = true; //Catatan
+                    worksheet.Cells["C" + (8 + offset) + ":E" + (10 + offset)].Merge = true; //Catatan
+                    worksheet.Cells["D" + (12 + offset) + ":E" + (12 + offset)].Merge = true; //Kepala gudang
 
                     if (offset > 0)
                     {
                         for (int i = 0; i < offset; i++)
                         {
-                            worksheet.Cells["B" + (9 + i) + ":C" + (9 + i)].Merge = true;
+                            worksheet.Cells["B" + (7 + i) + ":C" + (7 + i)].Merge = true;
                         }
                     }
 
@@ -244,51 +245,64 @@ namespace INVOICE
                     worksheet.Column(7).Width = 12;
                     worksheet.Column(8).Width = 12;
                     worksheet.Column(9).Width = 12;
-
-                    worksheet.Row(7).Height = 1;
+                    
 
                     
                     ///////////////////////
                     // Styling Operation //
                     ///////////////////////
                     
-                    worksheet.Cells["A1:I6"].Style.Font.SetFromFont(new Font("Calibri", 12));
-                    worksheet.Cells["A1:I6"].Style.Font.Bold = true;
+                    worksheet.Cells["A1:I5"].Style.Font.SetFromFont(new Font("Calibri", 12));
+                    worksheet.Cells["A1:I5"].Style.Font.Bold = true;
                     worksheet.Cells["D5"].Style.Font.UnderLine = true;
-                    worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Style.WrapText = true;
+                    worksheet.Cells["C" + (8 + offset) + ":E" + (10 + offset)].Style.WrapText = true;
                     worksheet.Cells["D5"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                    worksheet.Cells["A8:I8"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    worksheet.Cells["A6:I6"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
                     //ITEMS
                     if (offset > 0)
                     {
-                        worksheet.Cells["D9:D" + (9+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                        worksheet.Cells["F9:I" + (9+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        worksheet.Cells["D7:D" + (7+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                        worksheet.Cells["F7:I" + (7+ offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
                     }
 
-                    worksheet.Cells["G" + (9 + offset) + ":G" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
-                    worksheet.Cells["H" + (9 + offset) + ":H" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                    worksheet.Cells["I" + (9 + offset) + ":I" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                    worksheet.Cells["A" + (10 + offset) + ":B" + (10 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
-                    worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
-                    worksheet.Cells["A" + (14 + offset) + ":I" + (14 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    worksheet.Cells["G" + (7 + offset) + ":G" + (10 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Left;
+                    worksheet.Cells["H" + (7 + offset) + ":H" + (10 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+                    worksheet.Cells["I" + (7 + offset) + ":I" + (10 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                    worksheet.Cells["A" + (8 + offset) + ":B" + (8 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Right;
+                    worksheet.Cells["C" + (8 + offset) + ":E" + (8 + offset)].Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Top;
+                    worksheet.Cells["A" + (12 + offset) + ":I" + (12 + offset)].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
                                         
                     ////////////
                     // Border //
                     ////////////
                     
-                    worksheet.Cells["A8:I8"].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                    worksheet.Cells["A8:I8"].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                    worksheet.Cells["A" + (9 + offset) + ":I" + (9 + offset)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                    worksheet.Cells["C" + (10 + offset) + ":E" + (12 + offset)].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
-                    worksheet.Cells["G" + (12 + offset) + ":I" + (12 + offset)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                    worksheet.Cells["B" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                    worksheet.Cells["D" + (17 + offset) + ":E" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                    worksheet.Cells["G" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                    worksheet.Cells["I" + (17 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    worksheet.Cells["A6:I6"].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["A6:I6"].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["A" + (7 + offset) + ":I" + (7 + offset)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    worksheet.Cells["C" + (8 + offset) + ":E" + (10 + offset)].Style.Border.BorderAround(OfficeOpenXml.Style.ExcelBorderStyle.Thin);
+                    worksheet.Cells["G" + (10 + offset) + ":I" + (10 + offset)].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    worksheet.Cells["B" + (15 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    worksheet.Cells["D" + (15 + offset) + ":E" + (15 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    worksheet.Cells["G" + (15 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                    worksheet.Cells["I" + (15 + offset)].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
 
                     // SET PRINT AREA //
-                    worksheet.PrinterSettings.PrintArea = worksheet.Cells["A1:I" + (17 + offset)];
+                    worksheet.PrinterSettings.PrintArea = worksheet.Cells["A1:I" + (15 + offset)];
+
+                    // SET MARGIN //
+                    worksheet.PrinterSettings.HeaderMargin = 0;
+                    worksheet.PrinterSettings.FooterMargin= 0;
+                    worksheet.PrinterSettings.LeftMargin = (decimal)0.5;
+                    worksheet.PrinterSettings.RightMargin = (decimal)0.5;
+                    worksheet.PrinterSettings.TopMargin = (decimal)0.5;
+                    worksheet.PrinterSettings.BottomMargin = (decimal)0.5;
+
+                    // 
+                    worksheet.PrinterSettings.BlackAndWhite = true;
+                    ePaperSize HalfLetter = new ePaperSize();
+
+                    worksheet.PrinterSettings.PaperSize = ePaperSize.A5;
 
                     ///////////////////////
                     // FILE IO OPERATION //
@@ -389,7 +403,10 @@ namespace INVOICE
         private void button1_Click(object sender, EventArgs e)
         {
             DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
-            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "", "200", "");
+            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
+            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
+            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
+            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
         }
     }
 }

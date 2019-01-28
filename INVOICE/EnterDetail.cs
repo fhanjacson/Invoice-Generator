@@ -60,7 +60,11 @@ namespace INVOICE
 
         private void EnterDetail_Load(object sender, EventArgs e)
         {
-
+            TextBox_InvoiceNo.Text = "001/SSB/2019";
+            TextBox_Address1.Text = "FIE FIE";
+            TextBox_Address2.Text = "Tembesi Centre A3 no 5";
+            TextBox_Address3.Text = "Batu Aji, Batam";
+            TextBox_ContactNo.Text = "08117700609";
         }
     }
 }
