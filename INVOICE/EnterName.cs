@@ -34,6 +34,9 @@ namespace INVOICE
                     this.Close();
                 }
             }
+            else if (string.IsNullOrEmpty(TextBox_Name.Text) || string.IsNullOrWhiteSpace(TextBox_Name.Text)){
+                MessageBox.Show("Nama tidak boleh kosong");
+            }
             else
             {
                 this.Close();

@@ -237,14 +237,14 @@ namespace INVOICE
                     ///////////////////////
 
                     worksheet.Column(1).Width = 3;
-                    worksheet.Column(2).Width = 10;
-                    worksheet.Column(3).Width = 15;
-                    worksheet.Column(4).Width = 6;
-                    worksheet.Column(5).Width = 6;
-                    worksheet.Column(6).Width = 12;
-                    worksheet.Column(7).Width = 12;
-                    worksheet.Column(8).Width = 12;
-                    worksheet.Column(9).Width = 12;
+                    worksheet.Column(2).Width = 12;
+                    worksheet.Column(3).Width = 12;
+                    worksheet.Column(4).Width = 7.5;
+                    worksheet.Column(5).Width = 7.5;
+                    worksheet.Column(6).Width = 15;
+                    worksheet.Column(7).Width = 15;
+                    worksheet.Column(8).Width = 15;
+                    worksheet.Column(9).Width = 15;
                     
 
                     
@@ -290,19 +290,14 @@ namespace INVOICE
                     // SET PRINT AREA //
                     worksheet.PrinterSettings.PrintArea = worksheet.Cells["A1:I" + (15 + offset)];
 
-                    // SET MARGIN //
+                    // Printer Settings //
                     worksheet.PrinterSettings.HeaderMargin = 0;
                     worksheet.PrinterSettings.FooterMargin= 0;
-                    worksheet.PrinterSettings.LeftMargin = (decimal)0.5;
-                    worksheet.PrinterSettings.RightMargin = (decimal)0.5;
-                    worksheet.PrinterSettings.TopMargin = (decimal)0.5;
-                    worksheet.PrinterSettings.BottomMargin = (decimal)0.5;
-
-                    // 
+                    worksheet.PrinterSettings.LeftMargin = 0;
+                    worksheet.PrinterSettings.RightMargin = 0;
+                    worksheet.PrinterSettings.TopMargin = 0;
+                    worksheet.PrinterSettings.BottomMargin = 0;
                     worksheet.PrinterSettings.BlackAndWhite = true;
-                    ePaperSize HalfLetter = new ePaperSize();
-
-                    worksheet.PrinterSettings.PaperSize = ePaperSize.A5;
 
                     ///////////////////////
                     // FILE IO OPERATION //
@@ -318,7 +313,7 @@ namespace INVOICE
                     {
                         System.Diagnostics.Process.Start(ExcelFile.ToString());
                     }
-                    Done();
+                    //Done();
                 }
                 else
                 {
@@ -393,6 +388,8 @@ namespace INVOICE
         private void Editor_Load(object sender, EventArgs e)
         {
             DGV.CurrentCell = DGV.Rows[0].Cells[0];
+            //button1.Visible = true;
+
         }
 
         private void DGV_RowEnter(object sender, DataGridViewCellEventArgs e)
@@ -402,11 +399,10 @@ namespace INVOICE
 
         private void button1_Click(object sender, EventArgs e)
         {
-            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
-            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
-            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
-            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
-            DGV.Rows.Add("ITEM 01", "12", "Pcs", "8000", "" , "200", "" );
+            for (int i = 0; i < 10; i++)
+            {
+                DGV.Rows.Add("ITEM 01", "12", "Pcs", "200000", "", "10000", "");
+            }
         }
     }
 }
