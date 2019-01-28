@@ -60,6 +60,7 @@ namespace INVOICE
 
         private void EnterDetail_Load(object sender, EventArgs e)
         {
+            TextBox_Address3.Visible = false;
             //debug();
         }
 
